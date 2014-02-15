@@ -42,7 +42,23 @@ function create() {
 	// set up physics
 	bird.body.gravity.y = 500;
 	bird.body.collideWorldBounds = true;
+
+	// create a new group, which would holds all created pipes
+	pipes = game.add.group();
+	function producePipes() {
+		var pipe = createPipe(0, window_height - LAND_HEIGHT);
+		pipe.x = -pipes.x + window_width;
+		pipes.add(pipe);
+		console.log(pipes.length);
+		// add a timer to create a pipe every a few seconds
+		// add loop to create pipes with one second delay
+		// this is a recursive call	
+		game.time.events.add(Phaser.Timer.SECOND * 2, producePipes, this);	
+	}
+	producePipes();
 }
+
+
 
 
 function update() {
