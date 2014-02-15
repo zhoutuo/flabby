@@ -16,7 +16,11 @@ var sky;
 function create() {
 	// set up the background
 	game.stage.backgroundColor = '#4EC0CA';
+	// set land sprite and collision
 	land = game.add.tileSprite(0, window_height - 112, window_width, 112, 'land');
+	land.body.immovable = true;
+	// width, height, translateX, translateY
+	land.body.setRectangle(window_width, 112, 0, 0);
 	sky = game.add.tileSprite(0, window_height - 112 - 109, window_width, 109, 'sky');	
 	// create our beloved bird character in the scene
 	bird = game.add.sprite(300, 200, 'bird');
@@ -42,4 +46,6 @@ function update() {
 	if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
 		bird.body.velocity.y = -150;
 	}
+	// collision
+	game.physics.collide(bird, land);
 }
