@@ -9,10 +9,17 @@ function preload() {
 	game.load.image('sky', 'assets/sky.png');
 	// load land background
 	game.load.image('land', 'assets/land.png');
+	// load pipe images
+	game.load.image('pipe_inner', 'assets/pipe.png');
+	// used for pipes facing down
+	game.load.image('pipe_down', 'assets/pipe-down.png');
+	// used for pipes facing up
+	game.load.image('pipe_up', 'assets/pipe-up.png');
 }
 var bird;
 var land;
 var sky;
+var pipes; // this is a group of pipe sprites
 function create() {
 	// set up the background
 	game.stage.backgroundColor = '#4EC0CA';
@@ -50,4 +57,46 @@ function update() {
 	}
 	// collision
 	game.physics.collide(bird, land);
+}
+
+
+function createPipe(posX, minY, maxY) {
+	var pipe_gap = 150;
+	var pipe_padding = 80;
+	// random a position for pipe down sprite
+	// which should take gap into consideration
+	// make sure the second value is bigger than first value
+	console.assert(minY + pipe_padding < maxY - pipe_gap - pipe_padding);
+	var pipe_down_pos = getRandomInt(minY + pipe_padding, maxY - pipe_gap - pipe_padding);
+	var pipe_up_pos = pipe_down_pos + pipe_gap;
+	// create sprites and tile sprites
+	var PIPE_INNER_WIDTH = 50;
+	// create a group to hold all components
+	var pipe = game.add.group();
+	// upper part
+	var pipe_down_inner = game.add.tileSprite(posX, 0, PIPE_INNER_WIDTH, pipe_down_pos, 'pipe_inner');
+	var pipe_down = game.add.sprite(posX, pipe_down_pos, 'pipe_down');
+	// lower part
+	var PIPE_UP_HEIGHT = 26;
+	var pipe_up = game.add.sprite(posX, pipe_up_pos, 'pipe_up');
+	var pipe_up_inner = game.add.tileSprite(
+			posX, 
+			pipe_up_pos + PIPE_UP_HEIGHT, 
+			PIPE_INNER_WIDTH, 
+			maxY - pipe_up_pos - PIPE_UP_HEIGHT,
+			'pipe_inner'
+		);
+	// add to group
+	pipe.add(pipe_down_inner);
+	pipe.add(pipe_down);
+	pipe.add(pipe_up);
+	pipe.add(pipe_up_inner);
+	return pipe;
+}
+
+
+// Returns a random integer between min and max
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }
