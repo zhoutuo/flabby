@@ -57,6 +57,7 @@ function update() {
 	}
 	// collision
 	game.physics.collide(bird, land);
+	game.physics.collide(bird, pipes);
 }
 
 
@@ -75,17 +76,28 @@ function createPipe(minY, maxY) {
 	var pipe = game.add.group();
 	// upper part
 	var pipe_down_inner = game.add.tileSprite(0, 0, PIPE_INNER_WIDTH, pipe_down_pos, 'pipe_inner');
+	pipe_down_inner.body.immovable = true;
+	pipe_down_inner.body.setRectangle(PIPE_INNER_WIDTH, pipe_down_pos, 0, 0);
 	var pipe_down = game.add.sprite(0, pipe_down_pos, 'pipe_down');
+	pipe_down.body.immovable = true;
 	// lower part
 	var PIPE_UP_HEIGHT = 26;
 	var pipe_up = game.add.sprite(0, pipe_up_pos, 'pipe_up');
+	pipe_up.body.immovable = true;
 	var pipe_up_inner = game.add.tileSprite(
-			0, 
-			pipe_up_pos + PIPE_UP_HEIGHT, 
-			PIPE_INNER_WIDTH, 
-			maxY - pipe_up_pos - PIPE_UP_HEIGHT,
-			'pipe_inner'
-		);
+		0, 
+		pipe_up_pos + PIPE_UP_HEIGHT, 
+		PIPE_INNER_WIDTH, 
+		maxY - pipe_up_pos - PIPE_UP_HEIGHT,
+		'pipe_inner'
+	);
+	pipe_up_inner.body.immovable = true;
+	pipe_up_inner.body.setRectangle(
+		PIPE_INNER_WIDTH, 
+		maxY - pipe_up_pos - PIPE_UP_HEIGHT,
+		0,
+		0
+	);
 	// add to group
 	pipe.add(pipe_down_inner);
 	pipe.add(pipe_down);
