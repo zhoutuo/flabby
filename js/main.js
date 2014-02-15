@@ -17,11 +17,13 @@ function create() {
 	// set up the background
 	game.stage.backgroundColor = '#4EC0CA';
 	// set land sprite and collision
-	land = game.add.tileSprite(0, window_height - 112, window_width, 112, 'land');
+	var LAND_HEIGHT = 112; // based on sprite size
+	land = game.add.tileSprite(0, window_height - LAND_HEIGHT, window_width, LAND_HEIGHT, 'land');
 	land.body.immovable = true;
 	// width, height, translateX, translateY
-	land.body.setRectangle(window_width, 112, 0, 0);
-	sky = game.add.tileSprite(0, window_height - 112 - 109, window_width, 109, 'sky');	
+	land.body.setRectangle(window_width, LAND_HEIGHT, 0, 0);
+	var SKY_HEIGHT = 109; // based on sprite size
+	sky = game.add.tileSprite(0, window_height - LAND_HEIGHT - SKY_HEIGHT, window_width, SKY_HEIGHT, 'sky');	
 	// create our beloved bird character in the scene
 	bird = game.add.sprite(300, 200, 'bird');
 	// set the anchor to the center of the bird
