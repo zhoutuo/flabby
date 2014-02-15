@@ -60,7 +60,7 @@ function update() {
 }
 
 
-function createPipe(posX, minY, maxY) {
+function createPipe(minY, maxY) {
 	var pipe_gap = 150;
 	var pipe_padding = 80;
 	// random a position for pipe down sprite
@@ -74,13 +74,13 @@ function createPipe(posX, minY, maxY) {
 	// create a group to hold all components
 	var pipe = game.add.group();
 	// upper part
-	var pipe_down_inner = game.add.tileSprite(posX, 0, PIPE_INNER_WIDTH, pipe_down_pos, 'pipe_inner');
-	var pipe_down = game.add.sprite(posX, pipe_down_pos, 'pipe_down');
+	var pipe_down_inner = game.add.tileSprite(0, 0, PIPE_INNER_WIDTH, pipe_down_pos, 'pipe_inner');
+	var pipe_down = game.add.sprite(0, pipe_down_pos, 'pipe_down');
 	// lower part
 	var PIPE_UP_HEIGHT = 26;
-	var pipe_up = game.add.sprite(posX, pipe_up_pos, 'pipe_up');
+	var pipe_up = game.add.sprite(0, pipe_up_pos, 'pipe_up');
 	var pipe_up_inner = game.add.tileSprite(
-			posX, 
+			0, 
 			pipe_up_pos + PIPE_UP_HEIGHT, 
 			PIPE_INNER_WIDTH, 
 			maxY - pipe_up_pos - PIPE_UP_HEIGHT,
