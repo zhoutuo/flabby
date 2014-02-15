@@ -25,7 +25,7 @@ function create() {
 	var SKY_HEIGHT = 109; // based on sprite size
 	sky = game.add.tileSprite(0, window_height - LAND_HEIGHT - SKY_HEIGHT, window_width, SKY_HEIGHT, 'sky');	
 	// create our beloved bird character in the scene
-	bird = game.add.sprite(300, 200, 'bird');
+	bird = game.add.sprite(80, (window_height - LAND_HEIGHT) / 2, 'bird');
 	// set the anchor to the center of the bird
 	bird.anchor.setTo(0.5, 0.5);
 	// add an animation called flap, which will use all four frames in the sheet
