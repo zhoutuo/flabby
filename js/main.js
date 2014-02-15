@@ -40,20 +40,22 @@ function create() {
 	// stat flapping
 	bird.animations.play('flap', 10, true);
 	// set up physics
-	bird.body.gravity.y = 400;
+	bird.body.gravity.y = 500;
 	bird.body.collideWorldBounds = true;
 }
 
 
 function update() {
 	// move background tiles
-	land.tilePosition.x -= 1;
-	sky.tilePosition.x -= 1;
+	land.tilePosition.x -= 2;
+	sky.tilePosition.x -= 2;
+	// move pipes
+	pipes.x -= 2;
 	// update the rotation of each frame
 	bird.angle = Math.min(bird.body.velocity.y / 3, 90);
 	// use space to flap the bird
 	if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-		bird.body.velocity.y = -150;
+		bird.body.velocity.y = -250;
 	}
 	// collision
 	game.physics.collide(bird, land);
