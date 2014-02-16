@@ -15,6 +15,8 @@ function preload() {
 	game.load.image('pipe_down', 'assets/pipe-down.png');
 	// used for pipes facing up
 	game.load.image('pipe_up', 'assets/pipe-up.png');
+	// used to fill pipe gaps
+	game.load.image('pipe_filler', 'assets/pipe-filler.png');
 }
 var bird;
 var land;
@@ -96,8 +98,25 @@ function createPipe(minY, maxY) {
 	var pipe_down_inner = game.add.tileSprite(0, 0, PIPE_INNER_WIDTH, pipe_down_pos, 'pipe_inner');
 	pipe_down_inner.body.immovable = true;
 	pipe_down_inner.body.setRectangle(PIPE_INNER_WIDTH, pipe_down_pos, 0, 0);
+	var PIPE_DOWN_HEIGHT = 26;
 	var pipe_down = game.add.sprite(0, pipe_down_pos, 'pipe_down');
 	pipe_down.body.immovable = true;
+	// filler
+	var PIPE_FILLER_WIDTH = 2;
+	var pipe_gap_filler = game.add.tileSprite(
+		PIPE_INNER_WIDTH, 
+		pipe_down_pos + PIPE_DOWN_HEIGHT, 
+		PIPE_FILLER_WIDTH, 
+		pipe_gap, 
+		'pipe_filler'
+	);
+	pipe_gap_filler.body.immovable = true;
+	pipe_gap_filler.body.setRectangle(
+		PIPE_FILLER_WIDTH,
+		pipe_gap,
+		0,
+		0
+	);
 	// lower part
 	var PIPE_UP_HEIGHT = 26;
 	var pipe_up = game.add.sprite(0, pipe_up_pos, 'pipe_up');
@@ -119,6 +138,7 @@ function createPipe(minY, maxY) {
 	// add to group
 	pipe.add(pipe_down_inner);
 	pipe.add(pipe_down);
+	pipe.add(pipe_gap_filler);
 	pipe.add(pipe_up);
 	pipe.add(pipe_up_inner);
 	return pipe;
