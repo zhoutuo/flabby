@@ -60,24 +60,59 @@ function create() {
 	producePipes();
 }
 
+var STATES = {
+	SPLASH: 0,
+	GAME: 1,
+	END: 2
+}
 
-
+var state = STATES.GAME;
 
 function update() {
-	// move background tiles
-	land.tilePosition.x -= 2;
-	sky.tilePosition.x -= 2;
-	// move pipes
-	pipes.x -= 2;
-	// update the rotation of each frame
-	bird.angle = Math.min(bird.body.velocity.y / 3, 90);
-	// use space to flap the bird
-	if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-		bird.body.velocity.y = -250;
+	if(state == STATES.GAME) {
+		// move background tiles
+		land.tilePosition.x -= 2;
+		sky.tilePosition.x -= 2;
+		// move pipes
+		pipes.x -= 2;
+		// update the rotation of each frame
+		bird.angle = Math.min(bird.body.velocity.y / 3, 90);
+		// use space to flap the bird
+		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			bird.body.velocity.y = -250;
+		}
+		// collision
+		game.physics.collide(bird, land, playDead);
+		game.physics.collide(
+			// object 1
+			bird,
+			// object 2, which is a group
+			pipes,
+			// collision handler
+			playDead,
+			// process handler: this is set then collision will only happen if processCallback returns true
+			function(ob1, obj2) {
+				// if it is a filler between gap
+				// which is used to count number of pipes passed
+				if (obj2.key == 'pipe_filler') {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		);
+	} else if (state == STATES.END) {
+		// still need to collision here without handler
+		game.physics.collide(bird, land);
+		game.physics.collide(bird, pipes);
+	} else {
+
 	}
-	// collision
-	game.physics.collide(bird, land);
-	game.physics.collide(bird, pipes);
+}
+
+
+function playDead() {
+	state = STATES.END;
 }
 
 
