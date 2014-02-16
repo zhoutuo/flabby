@@ -103,8 +103,12 @@ function update() {
 		);
 	} else if (state == STATES.END) {
 		// still need to collision here without handler
-		game.physics.collide(bird, land);
-		game.physics.collide(bird, pipes);
+		game.physics.collide(bird, land, function() {
+			// stop flaping when hit the ground
+			bird.animations.stop('flap');
+		});
+		// update the rotation of each frame
+		bird.angle = Math.min(bird.body.velocity.y / 3, 90);		
 	} else {
 
 	}
