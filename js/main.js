@@ -42,7 +42,7 @@ function create() {
 	// stat flapping
 	bird.animations.play('flap', 10, true);
 	// set up physics
-	bird.body.gravity.y = 500;
+	bird.body.gravity.y = 700;
 	bird.body.collideWorldBounds = true;
 
 	// create a new group, which would holds all created pipes
@@ -79,7 +79,7 @@ function update() {
 		bird.angle = Math.min(bird.body.velocity.y / 3, 90);
 		// use space to flap the bird
 		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			bird.body.velocity.y = -250;
+			bird.body.velocity.y = -300;
 		}
 		// collision
 		game.physics.collide(bird, land, playDead);
