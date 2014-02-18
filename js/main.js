@@ -40,14 +40,13 @@ function create() {
 	bird.anchor.setTo(0.5, 0.5);
 	// add an animation called flap, which will use all four frames in the sheet
 	bird.animations.add('flap');
-	// stat flapping
-	bird.animations.play('flap', 10, true);
 	// set up physics
 	bird.body.gravity.y = 700;
 	bird.body.collideWorldBounds = true;
-
 	// create a new group, which would holds all created pipes
 	pipes = game.add.group();
+	// start the game
+	startGame();
 }
 
 var STATES = {
@@ -96,6 +95,10 @@ function update() {
 		game.physics.collide(bird, land, function() {
 			// stop flaping when hit the ground
 			bird.animations.stop('flap');
+			// use space to retart the game
+			if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+				startGame();
+			}			
 		});
 		// update the rotation of each frame
 		bird.angle = Math.min(bird.body.velocity.y / 3, 90);		
@@ -110,6 +113,23 @@ function producePipes() {
 	pipe.x = -pipes.x + window_width;
 	pipes.add(pipe);
 }
+
+function startGame() {
+	state = STATES.GAME;
+	// refresh the count
+	count = 0;
+	// display count with small digits
+	displayCount();		
+	// reposition
+	bird.x = 80;
+	bird.y = (window_height - LAND_HEIGHT) / 2;
+	// stat flapping
+	bird.animations.play('flap', 10, true);
+	// clean pipes
+	pipes.removeAll();
+	pipeProduction = game.time.events.loop(Phaser.Timer.SECOND * 2, producePipes, this);
+}
+
 
 function endGame() {
 	state = STATES.END;
