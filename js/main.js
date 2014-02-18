@@ -1,6 +1,6 @@
 var window_width = 800;
 var window_height = 600;
-var game = new Phaser.Game(window_width, window_height, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(window_width, window_height, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
 
 function preload() {
 	// load bird sprite sheet, there are four frames whose size is 34 * 24
