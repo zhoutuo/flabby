@@ -22,11 +22,12 @@ var bird;
 var land;
 var sky;
 var pipes; // this is a group of pipe sprites
+var LAND_HEIGHT;
 function create() {
 	// set up the background
 	game.stage.backgroundColor = '#4EC0CA';
 	// set land sprite and collision
-	var LAND_HEIGHT = 112; // based on sprite size
+	LAND_HEIGHT = 112; // based on sprite size
 	land = game.add.tileSprite(0, window_height - LAND_HEIGHT, window_width, LAND_HEIGHT, 'land');
 	land.body.immovable = true;
 	// width, height, translateX, translateY
@@ -47,17 +48,6 @@ function create() {
 
 	// create a new group, which would holds all created pipes
 	pipes = game.add.group();
-	function producePipes() {
-		var pipe = createPipe(0, window_height - LAND_HEIGHT);
-		pipe.x = -pipes.x + window_width;
-		pipes.add(pipe);
-		console.log(pipes.length);
-		// add a timer to create a pipe every a few seconds
-		// add loop to create pipes with one second delay
-		// this is a recursive call	
-		game.time.events.add(Phaser.Timer.SECOND * 2, producePipes, this);	
-	}
-	producePipes();
 }
 
 var STATES = {
@@ -114,9 +104,16 @@ function update() {
 	}
 }
 
+var pipeProduction;
+function producePipes() {
+	var pipe = createPipe(0, window_height - LAND_HEIGHT);
+	pipe.x = -pipes.x + window_width;
+	pipes.add(pipe);
+}
 
 function endGame() {
 	state = STATES.END;
+	game.time.events.remove(pipeProduction);
 }
 
 
