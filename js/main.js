@@ -17,6 +17,10 @@ function preload() {
 	game.load.image('pipe_up', 'assets/pipe-up.png');
 	// used to fill pipe gaps
 	game.load.image('pipe_filler', 'assets/pipe-filler.png');
+	// load small fonts
+	for(var i = 0; i < 10; ++i) {
+		game.load.image('font_small_' + i, 'assets/font_small_' + i + '.png')
+	}
 }
 var bird;
 var land;
@@ -45,6 +49,8 @@ function create() {
 	bird.body.collideWorldBounds = true;
 	// create a new group, which would holds all created pipes
 	pipes = game.add.group();
+	// a group to hold all digits
+	small_digits = game.add.group();
 	// start the game
 	startGame();
 }
@@ -72,23 +78,26 @@ function update() {
 		}
 		// collision
 		game.physics.collide(bird, land, endGame);
+		// this fucntion must go before the collide function below
+		// since without deleting the filler first after checking overlapping
+		// there would be collision between filler and bird
+		game.physics.overlap(bird, pipes, function(obj1, obj2) {
+			if (obj2.key == 'pipe_filler') {
+				// destroy the filler which is not needed anymore
+				obj2.destroy();
+				// increase the count
+				++count;
+				// update the display
+				displayCount();
+			}		
+		});		
 		game.physics.collide(
 			// object 1
 			bird,
 			// object 2, which is a group
 			pipes,
 			// collision handler
-			endGame,
-			// process handler: this is set then collision will only happen if processCallback returns true
-			function(ob1, obj2) {
-				// if it is a filler between gap
-				// which is used to count number of pipes passed
-				if (obj2.key == 'pipe_filler') {
-					return false;
-				} else {
-					return true;
-				}
-			}
+			endGame
 		);
 	} else if (state == STATES.END) {
 		// still need to collision here without handler
@@ -112,6 +121,29 @@ function producePipes() {
 	var pipe = createPipe(0, window_height - LAND_HEIGHT);
 	pipe.x = -pipes.x + window_width;
 	pipes.add(pipe);
+}
+
+var count;
+var small_digits;
+function displayCount() {
+	// clear small_digits
+	small_digits.removeAll();
+	// a temporary variable to calculate each digit
+	var tmp = count;
+	// a stack to hold all digit, with lowest in the bottom.
+	var nums = [];
+	do {
+		nums.push(tmp % 10);
+		tmp = Math.floor(tmp / 10);
+	} while(tmp);
+	var FONT_SMALL_WIDTH = 12;
+	var font_small_padding = 3;
+	var font_small_x = 10;
+	var font_small_y = 10;
+	while(nums.length) {
+		small_digits.add(game.add.sprite(font_small_x, font_small_y, 'font_small_' + nums.pop()));
+		font_small_x += (FONT_SMALL_WIDTH + font_small_padding);
+	}
 }
 
 function startGame() {
