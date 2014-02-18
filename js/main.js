@@ -82,14 +82,14 @@ function update() {
 			bird.body.velocity.y = -300;
 		}
 		// collision
-		game.physics.collide(bird, land, playDead);
+		game.physics.collide(bird, land, endGame);
 		game.physics.collide(
 			// object 1
 			bird,
 			// object 2, which is a group
 			pipes,
 			// collision handler
-			playDead,
+			endGame,
 			// process handler: this is set then collision will only happen if processCallback returns true
 			function(ob1, obj2) {
 				// if it is a filler between gap
@@ -115,7 +115,7 @@ function update() {
 }
 
 
-function playDead() {
+function endGame() {
 	state = STATES.END;
 }
 
