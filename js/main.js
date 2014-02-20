@@ -21,11 +21,18 @@ function preload() {
 	for(var i = 0; i < 10; ++i) {
 		game.load.image('font_small_' + i, 'assets/font_small_' + i + '.png')
 	}
+	// load score board
+	game.load.image('score_board', 'assets/scoreboard.png');
+	// load replay button
+	game.load.image('replay_button', 'assets/replay.png');
 }
 var bird;
 var land;
 var sky;
 var pipes; // this is a group of pipe sprites
+var score_board;
+var tween_down_board;
+var tween_up_board;
 var LAND_HEIGHT;
 function create() {
 	// set up the background
@@ -51,6 +58,29 @@ function create() {
 	pipes = game.add.group();
 	// a group to hold all digits
 	small_digits = game.add.group();
+	var SCORE_BOARD_WIDTH = 236;
+	var SCORE_BOARD_HEIGHT = 280;
+	// create a score board group with replay button
+	score_board = game.add.group()
+	score_board.create((window_width - SCORE_BOARD_WIDTH) / 2, (-window_height - SCORE_BOARD_HEIGHT) / 2, 'score_board');
+	// add replay button
+	var REPLAY_BUTTON_WIDTH = 115;
+	var REPLAY_BUTTON_HEIGHT = 70;
+	var replay_button = game.add.button(
+		(window_width - REPLAY_BUTTON_WIDTH) / 2, 
+		(-window_height - REPLAY_BUTTON_HEIGHT + SCORE_BOARD_HEIGHT) / 2,
+		'replay_button', 
+		// clicking callback function
+		function() {
+			// bring up the board
+			tween_up_board.start();
+			// restart the game
+			startGame();
+		}
+	);
+	score_board.add(replay_button);
+	tween_down_board = game.add.tween(score_board).to({ y: window_height });
+	tween_up_board = game.add.tween(score_board).to({ y: 0 }, 500);
 	// start the game
 	startGame();
 }
@@ -77,7 +107,18 @@ function update() {
 			bird.body.velocity.y = -300;
 		}
 		// collision
-		game.physics.collide(bird, land, endGame);
+		game.physics.collide(bird, land, endGame, function() {
+			// this is a hack, supposingly we do not need this,
+			// this if the bird's position is higher than the land
+			// they should not collide
+			// however there maybe a cache issue, the position used in the
+			// collision detection is not up-to-date.
+			if (bird.y < window_height - LAND_HEIGHT) {
+				return false;
+			} else {
+				return true;
+			}
+		});
 		// this fucntion must go before the collide function below
 		// since without deleting the filler first after checking overlapping
 		// there would be collision between filler and bird
@@ -103,11 +144,7 @@ function update() {
 		// still need to collision here without handler
 		game.physics.collide(bird, land, function() {
 			// stop flaping when hit the ground
-			bird.animations.stop('flap');
-			// use space to retart the game
-			if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-				startGame();
-			}			
+			bird.animations.stop('flap');	
 		});
 		// update the rotation of each frame
 		bird.angle = Math.min(bird.body.velocity.y / 3, 90);		
@@ -147,7 +184,6 @@ function displayCount() {
 }
 
 function startGame() {
-	state = STATES.GAME;
 	// refresh the count
 	count = 0;
 	// display count with small digits
@@ -160,12 +196,16 @@ function startGame() {
 	// clean pipes
 	pipes.removeAll();
 	pipeProduction = game.time.events.loop(Phaser.Timer.SECOND * 2, producePipes, this);
+	// change the state
+	state = STATES.GAME;
 }
 
 
 function endGame() {
 	state = STATES.END;
 	game.time.events.remove(pipeProduction);
+	// bring down score board
+	tween_down_board.start();
 }
 
 
