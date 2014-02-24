@@ -25,6 +25,11 @@ function preload() {
 	game.load.image('score_board', 'assets/scoreboard.png');
 	// load replay button
 	game.load.image('replay_button', 'assets/replay.png');
+	// music loading
+	game.load.audio('sfx_wing', 'assets/sounds/sfx_wing.ogg');
+	game.load.audio('sfx_hit', 'assets/sounds/sfx_hit.ogg');
+	game.load.audio('sfx_die', 'assets/sounds/sfx_die.ogg');
+	game.load.audio('sfx_point', 'assets/sounds/sfx_point.ogg');
 }
 var bird;
 var land;
@@ -59,6 +64,8 @@ function create() {
 	var spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 	spacebar.onUp.add(function() {
 		if(state == STATES.GAME) {
+			var sfx_wing = game.add.audio('sfx_wing');
+			sfx_wing.play();
 			bird.body.velocity.y = -300;
 		}
 	}, this);
@@ -132,6 +139,9 @@ function update() {
 				obj2.destroy();
 				// increase the count
 				++count;
+				// play sound
+				var sfx_point = game.add.audio('sfx_point');
+				sfx_point.play();
 				// update the display
 				displayCount();
 			}		
@@ -210,6 +220,14 @@ function endGame() {
 	game.time.events.remove(pipeProduction);
 	// bring down score board
 	tween_down_board.start();
+	// play hit sound
+	var sfx_hit = game.add.audio('sfx_hit');
+	var sfx_die = game.add.audio('sfx_die');
+	sfx_hit.onStop.add(function() {
+		// play dead sound
+		sfx_die.play();	
+	},this);
+	sfx_hit.play();
 }
 
 
