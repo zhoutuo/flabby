@@ -52,8 +52,16 @@ function create() {
 	// add an animation called flap, which will use all four frames in the sheet
 	bird.animations.add('flap');
 	// set up physics
-	bird.body.gravity.y = 700;
+	bird.body.gravity.y = 600;
 	bird.body.collideWorldBounds = true;
+	// set up flapping button
+	// spacebar
+	var spacebar = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+	spacebar.onUp.add(function() {
+		if(state == STATES.GAME) {
+			bird.body.velocity.y = -300;
+		}
+	}, this);
 	// create a new group, which would holds all created pipes
 	pipes = game.add.group();
 	// a group to hold all digits
@@ -102,10 +110,6 @@ function update() {
 		pipes.x -= 2;
 		// update the rotation of each frame
 		bird.angle = Math.min(bird.body.velocity.y / 3, 90);
-		// use space to flap the bird
-		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			bird.body.velocity.y = -300;
-		}
 		// collision
 		game.physics.collide(bird, land, endGame, function() {
 			// this is a hack, supposingly we do not need this,
