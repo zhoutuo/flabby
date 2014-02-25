@@ -1,7 +1,7 @@
 var window_width = 800;
 var window_height = 600;
 var game = new Phaser.Game(window_width, window_height, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
-
+var best_score;
 function preload() {
 	// load bird sprite sheet, there are four frames whose size is 34 * 24
 	game.load.spritesheet('bird', 'assets/bird.png', 34, 24, 4);
@@ -30,6 +30,15 @@ function preload() {
 	game.load.audio('sfx_hit', 'assets/sounds/sfx_hit.ogg');
 	game.load.audio('sfx_die', 'assets/sounds/sfx_die.ogg');
 	game.load.audio('sfx_point', 'assets/sounds/sfx_point.ogg');
+	// checking best score
+	best_score = Cookies.get('best');
+	if (typeof best_score == 'undefined') {
+		best_score = 0;
+		Cookies.set('best', String(best_score));
+	} else {
+		// it is a string if exists
+		best_score = parseInt(best_score);
+	}
 }
 var bird;
 var land;
@@ -72,18 +81,23 @@ function create() {
 	// create a new group, which would holds all created pipes
 	pipes = game.add.group();
 	// a group to hold all digits
-	small_digits = game.add.group();
+	counting_score_gui = game.add.group();
+	// define position of this gui element
+	counting_score_gui.x = 10;
+	counting_score_gui.y = 10;
 	var SCORE_BOARD_WIDTH = 236;
 	var SCORE_BOARD_HEIGHT = 280;
 	// create a score board group with replay button
 	score_board = game.add.group()
-	score_board.create((window_width - SCORE_BOARD_WIDTH) / 2, (-window_height - SCORE_BOARD_HEIGHT) / 2, 'score_board');
+	// set the position to be one screen above the current window
+	score_board.y = -window_height;
+	score_board.create((window_width - SCORE_BOARD_WIDTH) / 2, (window_height - SCORE_BOARD_HEIGHT) / 2, 'score_board');
 	// add replay button
 	var REPLAY_BUTTON_WIDTH = 115;
 	var REPLAY_BUTTON_HEIGHT = 70;
 	var replay_button = game.add.button(
 		(window_width - REPLAY_BUTTON_WIDTH) / 2, 
-		(-window_height - REPLAY_BUTTON_HEIGHT + SCORE_BOARD_HEIGHT) / 2,
+		(window_height - REPLAY_BUTTON_HEIGHT + SCORE_BOARD_HEIGHT) / 2,
 		'replay_button', 
 		// clicking callback function
 		function() {
@@ -94,8 +108,23 @@ function create() {
 		}
 	);
 	score_board.add(replay_button);
-	tween_down_board = game.add.tween(score_board).to({ y: window_height });
-	tween_up_board = game.add.tween(score_board).to({ y: 0 }, 500);
+	// add score
+	var BEST_SCORE_X = 180 + (window_width - SCORE_BOARD_WIDTH) / 2;
+	var BEST_SCORE_Y = 150 + (window_height - SCORE_BOARD_HEIGHT) / 2;
+	var best_score_gui = game.add.group();
+	best_score_gui.x = BEST_SCORE_X;
+	best_score_gui.y = BEST_SCORE_Y;
+	score_board.add(best_score_gui);
+
+	var CUR_SCORE_X = BEST_SCORE_X;
+	var CUR_SCORE_Y = BEST_SCORE_Y - 42;
+	var cur_socre_gui = game.add.group();
+	cur_socre_gui.x = CUR_SCORE_X;
+	cur_socre_gui.y = CUR_SCORE_Y;
+	score_board.add(cur_socre_gui);
+	// add tweens of the board moving
+	tween_down_board = game.add.tween(score_board).to({ y: 0 });
+	tween_up_board = game.add.tween(score_board).to({ y: -window_height }, 500);
 	// start the game
 	startGame();
 }
@@ -143,7 +172,7 @@ function update() {
 				var sfx_point = game.add.audio('sfx_point');
 				sfx_point.play();
 				// update the display
-				displayCount();
+				displayCount(counting_score_gui, count);
 			}		
 		});		
 		game.physics.collide(
@@ -175,24 +204,21 @@ function producePipes() {
 }
 
 var count;
-var small_digits;
-function displayCount() {
-	// clear small_digits
-	small_digits.removeAll();
-	// a temporary variable to calculate each digit
-	var tmp = count;
+var counting_score_gui;
+function displayCount(gui_element, value) {
+	// clear gui element
+	gui_element.removeAll();
 	// a stack to hold all digit, with lowest in the bottom.
 	var nums = [];
 	do {
-		nums.push(tmp % 10);
-		tmp = Math.floor(tmp / 10);
-	} while(tmp);
+		nums.push(value % 10);
+		value = Math.floor(value / 10);
+	} while(value);
 	var FONT_SMALL_WIDTH = 12;
 	var font_small_padding = 3;
-	var font_small_x = 10;
-	var font_small_y = 10;
+	var font_small_x = 0;
 	while(nums.length) {
-		small_digits.add(game.add.sprite(font_small_x, font_small_y, 'font_small_' + nums.pop()));
+		gui_element.add(game.add.sprite(font_small_x, 0, 'font_small_' + nums.pop()));
 		font_small_x += (FONT_SMALL_WIDTH + font_small_padding);
 	}
 }
@@ -201,7 +227,7 @@ function startGame() {
 	// refresh the count
 	count = 0;
 	// display count with small digits
-	displayCount();		
+	displayCount(counting_score_gui, count);		
 	// reposition
 	bird.x = 80;
 	bird.y = (window_height - LAND_HEIGHT) / 2;
@@ -218,6 +244,13 @@ function startGame() {
 function endGame() {
 	state = STATES.END;
 	game.time.events.remove(pipeProduction);
+	// checkign score
+	best_score = Math.max(best_score, count);
+	// set the score cookie
+	Cookies.set('best', String(best_score));
+	// display score
+	displayCount(best_score_gui, best_score);
+	displayCount(cur_socre_gui, count);	
 	// bring down score board
 	tween_down_board.start();
 	// play hit sound
