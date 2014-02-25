@@ -1,6 +1,4 @@
-var window_width = 800;
-var window_height = 600;
-var game = new Phaser.Game(window_width, window_height, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', { preload: preload, create: create, update: update });
 var best_score;
 function preload() {
 	// load bird sprite sheet, there are four frames whose size is 34 * 24
@@ -45,14 +43,13 @@ var land;
 var sky;
 var pipes; // this is a group of pipe sprites
 var score_board;
-var tween_down_board;
-var tween_up_board;
-var LAND_HEIGHT;
 function create() {
+	var window_width = game.width;
+	var window_height = game.height;
 	// set up the background
 	game.stage.backgroundColor = '#4EC0CA';
 	// set land sprite and collision
-	LAND_HEIGHT = 112; // based on sprite size
+	var LAND_HEIGHT = 112; // based on sprite size
 	land = game.add.tileSprite(0, window_height - LAND_HEIGHT, window_width, LAND_HEIGHT, 'land');
 	land.body.immovable = true;
 	// width, height, translateX, translateY
@@ -102,7 +99,7 @@ function create() {
 		// clicking callback function
 		function() {
 			// bring up the board
-			tween_up_board.start();
+			score_board.bring_up.start();
 			// restart the game
 			startGame();
 		}
@@ -123,8 +120,16 @@ function create() {
 	cur_socre_gui.y = CUR_SCORE_Y;
 	score_board.add(cur_socre_gui);
 	// add tweens of the board moving
-	tween_down_board = game.add.tween(score_board).to({ y: 0 });
-	tween_up_board = game.add.tween(score_board).to({ y: -window_height }, 500);
+	var tween_down_board = game.add.tween(score_board).to({ y: 0 });
+	tween_down_board.onStart.add(function() {
+		// display score
+		displayCount(best_score_gui, best_score);
+		displayCount(cur_socre_gui, count);			
+	}, this);
+	var tween_up_board = game.add.tween(score_board).to({ y: -window_height }, 500);
+	// set properties
+	score_board.bring_down = tween_down_board;
+	score_board.bring_up = tween_up_board;
 	// start the game
 	startGame();
 }
@@ -153,7 +158,7 @@ function update() {
 			// they should not collide
 			// however there maybe a cache issue, the position used in the
 			// collision detection is not up-to-date.
-			if (bird.y < window_height - LAND_HEIGHT) {
+			if (bird.y < game.height - land.height) {
 				return false;
 			} else {
 				return true;
@@ -198,8 +203,8 @@ function update() {
 
 var pipeProduction;
 function producePipes() {
-	var pipe = createPipe(0, window_height - LAND_HEIGHT);
-	pipe.x = -pipes.x + window_width;
+	var pipe = createPipe(0, game.height - land.height);
+	pipe.x = -pipes.x + game.width;
 	pipes.add(pipe);
 }
 
@@ -230,7 +235,7 @@ function startGame() {
 	displayCount(counting_score_gui, count);		
 	// reposition
 	bird.x = 80;
-	bird.y = (window_height - LAND_HEIGHT) / 2;
+	bird.y = (game.height - land.height) / 2;
 	// stat flapping
 	bird.animations.play('flap', 10, true);
 	// clean pipes
@@ -248,11 +253,8 @@ function endGame() {
 	best_score = Math.max(best_score, count);
 	// set the score cookie
 	Cookies.set('best', String(best_score));
-	// display score
-	displayCount(best_score_gui, best_score);
-	displayCount(cur_socre_gui, count);	
 	// bring down score board
-	tween_down_board.start();
+	score_board.bring_down.start();
 	// play hit sound
 	var sfx_hit = game.add.audio('sfx_hit');
 	var sfx_die = game.add.audio('sfx_die');
