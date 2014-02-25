@@ -28,6 +28,11 @@ function preload() {
 	game.load.audio('sfx_hit', 'assets/sounds/sfx_hit.ogg');
 	game.load.audio('sfx_die', 'assets/sounds/sfx_die.ogg');
 	game.load.audio('sfx_point', 'assets/sounds/sfx_point.ogg');
+	// medal loading
+	game.load.image('medal_bronze', 'assets/medal_bronze.png');
+	game.load.image('medal_silver', 'assets/medal_silver.png');
+	game.load.image('medal_gold', 'assets/medal_gold.png');
+	game.load.image('medal_platinum', 'assets/medal_platinum.png');
 	// checking best score
 	best_score = Cookies.get('best');
 	if (typeof best_score == 'undefined') {
@@ -115,16 +120,34 @@ function create() {
 
 	var CUR_SCORE_X = BEST_SCORE_X;
 	var CUR_SCORE_Y = BEST_SCORE_Y - 42;
-	var cur_socre_gui = game.add.group();
-	cur_socre_gui.x = CUR_SCORE_X;
-	cur_socre_gui.y = CUR_SCORE_Y;
-	score_board.add(cur_socre_gui);
+	var cur_score_gui = game.add.group();
+	cur_score_gui.x = CUR_SCORE_X;
+	cur_score_gui.y = CUR_SCORE_Y;
+	score_board.add(cur_score_gui);
+	// add medal
+	var MEDAL_X = 32 + (window_width - SCORE_BOARD_WIDTH) / 2;
+	var MEDAL_Y = 112 + (window_height - SCORE_BOARD_HEIGHT) / 2;
+	var medal_gui = game.add.group();
+	medal_gui.x = MEDAL_X;
+	medal_gui.y = MEDAL_Y;
+	score_board.add(medal_gui);
 	// add tweens of the board moving
 	var tween_down_board = game.add.tween(score_board).to({ y: 0 });
 	tween_down_board.onStart.add(function() {
 		// display score
 		displayCount(best_score_gui, best_score);
-		displayCount(cur_socre_gui, count);			
+		displayCount(cur_score_gui, count);
+		// display medal
+		medal_gui.removeAll();
+		if (count <= 10) {
+			medal_gui.create(0, 0, 'medal_bronze');
+		} else if (count <= 20) {
+			medal_gui.create(0, 0, 'medal_silver');
+		} else if (count <= 30) {
+			medal_gui.create(0, 0, 'medal_gold');
+		} else {
+			medal_gui.create(0, 0, 'medal_platinum');
+		}
 	}, this);
 	var tween_up_board = game.add.tween(score_board).to({ y: -window_height }, 500);
 	// set properties
