@@ -19,6 +19,10 @@ function preload() {
 	for(var i = 0; i < 10; ++i) {
 		game.load.image('font_small_' + i, 'assets/font_small_' + i + '.png')
 	}
+	// load big fonts
+	for(i = 0; i < 10; ++i) {
+		game.load.image('font_big_' + i, 'assets/font_big_' + i + '.png')
+	}
 	// load score board
 	game.load.image('score_board', 'assets/scoreboard.png');
 	// load replay button
@@ -200,7 +204,7 @@ function update() {
 				var sfx_point = game.add.audio('sfx_point');
 				sfx_point.play();
 				// update the display
-				displayCount(counting_score_gui, count);
+				displayCount(counting_score_gui, count, true);
 			}		
 		});		
 		game.physics.collide(
@@ -233,7 +237,9 @@ function producePipes() {
 
 var count;
 var counting_score_gui;
-function displayCount(gui_element, value) {
+function displayCount(gui_element, value, isBig) {
+	// set default argument
+	isBig = isBig || false;
 	// clear gui element
 	gui_element.removeAll();
 	// a stack to hold all digit, with lowest in the bottom.
@@ -242,20 +248,21 @@ function displayCount(gui_element, value) {
 		nums.push(value % 10);
 		value = Math.floor(value / 10);
 	} while(value);
-	var FONT_SMALL_WIDTH = 12;
-	var font_small_padding = 3;
-	var font_small_x = 0;
+	var font_string = isBig ? 'font_big_' : 'font_small_';
+	var FONT_WIDTH = game.cache.getImage(font_string + '0').width;
+	var font_padding = 3;
+	var font_x = 0;
 	while(nums.length) {
-		gui_element.add(game.add.sprite(font_small_x, 0, 'font_small_' + nums.pop()));
-		font_small_x += (FONT_SMALL_WIDTH + font_small_padding);
+		gui_element.add(game.add.sprite(font_x, 0, font_string + nums.pop()));
+		font_x += (FONT_WIDTH + font_padding);
 	}
 }
 
 function startGame() {
 	// refresh the count
 	count = 0;
-	// display count with small digits
-	displayCount(counting_score_gui, count);		
+	// display count with big digits
+	displayCount(counting_score_gui, count, true);		
 	// reposition
 	bird.x = 80;
 	bird.y = (game.height - land.height) / 2;
