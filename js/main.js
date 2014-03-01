@@ -60,15 +60,18 @@ MainState.prototype = {
 		this.bird.body.gravity.y = 600;
 		this.bird.body.collideWorldBounds = true;
 		// set up flapping button
-		// spacebar
-		var spacebar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		spacebar.onDown.add(function() {
+		var fly_up = function() {
 			if (this.internal_state == this.STATES.GAME) {
 				var sfx_wing = this.game.add.audio('sfx_wing');
 				sfx_wing.play();
 				this.bird.body.velocity.y = -300;
 			}
-		}, this);
+		};
+		// spacebar
+		var spacebar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+		spacebar.onDown.add(fly_up, this);
+		// add a pointer down support(mouse click or touch screen tap) as well
+		this.game.input.onDown.add(fly_up, this);
 		// create a new group, which would holds all created pipes
 		this.pipes = this.game.add.group();
 		// a group to hold all digits
