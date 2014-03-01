@@ -62,7 +62,7 @@ MainState.prototype = {
 		// set up flapping button
 		// spacebar
 		var spacebar = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-		spacebar.onUp.add(function() {
+		spacebar.onDown.add(function() {
 			if (this.internal_state == this.STATES.GAME) {
 				var sfx_wing = this.game.add.audio('sfx_wing');
 				sfx_wing.play();
@@ -130,14 +130,14 @@ MainState.prototype = {
 			this.displayCount(cur_score_gui, this.count);
 			// display medal
 			medal_gui.removeAll();
-			if (this.count <= 10) {
-				medal_gui.create(0, 0, 'medal_bronze');
-			} else if (this.count <= 20) {
-				medal_gui.create(0, 0, 'medal_silver');
-			} else if (this.count <= 30) {
-				medal_gui.create(0, 0, 'medal_gold');
-			} else {
+			if (this.count >= 100) {
 				medal_gui.create(0, 0, 'medal_platinum');
+			} else if (this.count >= 50) {
+				medal_gui.create(0, 0, 'medal_gold');
+			} else if (this.count >= 20) {
+				medal_gui.create(0, 0, 'medal_silver');
+			} else if (this.count >= 10){
+				medal_gui.create(0, 0, 'medal_bronze');
 			}
 		}, this);
 		var tween_up_board = this.game.add.tween(this.score_board).to({
