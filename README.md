@@ -7,7 +7,11 @@ Yet another **Flappy Bird** recreation, which is based on [**Phaser**][1] (An aw
 
 Copyright
 ---------
-All assets come from [here][2], as mentioned by that repository, the copyright belongs to the original **Flabby Bird** author. My project is merely for coding practice.
+Most assets come from [here][2], as mentioned by that repository, the copyright belongs to the original **Flabby Bird** author. 
+
+The rest is from the Internet. 
+
+My project is merely for coding practice.
 
 
   [1]: https://github.com/photonstorm/phaser
