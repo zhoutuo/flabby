@@ -11,6 +11,8 @@ PreLoader.prototype = {
 			(this.game.height - loading_bar_cache.height) / 2, 
 			'loading_bar'
 		);
+		// load splash
+		this.game.load.image('splash', 'assets/splash.png');
 		// load bird sprite sheet, there are four frames whose size is 34 * 24
 		this.game.load.spritesheet('bird', 'assets/bird.png', 34, 24, 4);
 		// load sky background

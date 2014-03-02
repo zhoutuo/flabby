@@ -56,8 +56,7 @@ MainState.prototype = {
 		this.bird.anchor.setTo(0.5, 0.5);
 		// add an animation called flap, which will use all four frames in the sheet
 		this.bird.animations.add('flap');
-		// set up physics
-		this.bird.body.gravity.y = 600;
+		// set up collision
 		this.bird.body.collideWorldBounds = true;
 		// set up flapping button
 		var fly_up = function() {
@@ -65,6 +64,11 @@ MainState.prototype = {
 				var sfx_wing = this.game.add.audio('sfx_wing');
 				sfx_wing.play();
 				this.bird.body.velocity.y = -300;
+			} else if (this.internal_state == this.STATES.SPLASH) {
+				// make splash screen disappear
+				this.game.add.tween(splash).to({ alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+				// start the game here
+				this.startGame();
 			}
 		};
 		// spacebar
@@ -96,8 +100,6 @@ MainState.prototype = {
 			function() {
 				// bring up the board
 				this.score_board.bring_up.start();
-				// restart the game
-				this.startGame();
 			},
 			this
 		);
@@ -146,11 +148,23 @@ MainState.prototype = {
 		var tween_up_board = this.game.add.tween(this.score_board).to({
 			y: -window_height
 		}, 500);
+		tween_up_board.onComplete.add(function(){
+			// restart the game
+			// only when the score board is completely repositioned
+			this.startGame();			
+		}, this);
 		// set properties
 		this.score_board.bring_down = tween_down_board;
 		this.score_board.bring_up = tween_up_board;
-		// start the game
-		this.startGame();
+		// set up splash screen
+		// init internal state
+		this.internal_state = this.STATES.SPLASH;
+		// load the sprite
+		var splash_cache = this.game.cache.getImage('splash');
+		var splash = this.game.add.sprite(
+			(this.game.width - splash_cache.width) / 2, 
+			(this.game.height - splash_cache.width) / 2,
+			'splash');	
 	},
 	update: function() {
 		if (this.internal_state == this.STATES.GAME) {
@@ -249,6 +263,8 @@ MainState.prototype.startGame = function() {
 	// reposition
 	this.bird.x = 80;
 	this.bird.y = (this.game.height - this.land.height) / 2;
+	// gravity
+	this.bird.body.gravity.y = 600;
 	// stat flapping
 	this.bird.animations.play('flap', 10, true);
 	// clean pipes
